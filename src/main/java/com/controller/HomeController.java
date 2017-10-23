@@ -1,5 +1,7 @@
 package com.controller;
 
+import com.bo.Page;
+import com.service.HomeService;
 import com.util.TextSearchUnit;
 import com.util.Unit;
 import com.vo.Project;
@@ -14,16 +16,13 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.SimpleFormatter;
+
 
 /**
  *
@@ -40,7 +39,6 @@ public class HomeController {
     @RequestMapping("/index")
     public String index(HttpServletRequest request, HttpServletResponse  response) throws FileNotFoundException {
         ArrayList<Project> list =new ArrayList<Project>();
-        request.setAttribute("a","asd");
         File file= new File("D:/lookPro/pro/");
         File[] tempList  =file.listFiles();
         StringBuffer result = new StringBuffer();
@@ -89,18 +87,6 @@ public class HomeController {
         }
 
     }
-    @RequestMapping("findPro")
-    public void findPro(HttpServletResponse response,HttpServletRequest request){
-        File file= new File("D:/lookPro/pro/");
-        File[] tempList  =file.listFiles();
-        for (int i = 0; i <tempList.length ; i++) {
-            if (tempList[i].isDirectory()){
-                System.out.println("文件夹:"+tempList[i]);
-
-            }
-        }
-    }
-
     @RequestMapping("/upload")
     public  String Upload(HttpServletRequest request, HttpServletResponse response , Project pro) throws Exception {
        CommonsMultipartFile file= pro.getPro();
@@ -360,5 +346,16 @@ public class HomeController {
             request.setAttribute("proList",proList);
 
         return "home";
+    }
+    public String findPro(HttpServletResponse response, HttpServletRequest request){
+        String proName =request.getParameter("proName");
+        String author =request.getParameter("author");
+        int PageNum = Integer.valueOf(request.getParameter("pageNum"));
+        int PageSize = 5;
+        HomeService  hs = new HomeService();
+        Page pb =hs.findAllProWithPage(PageNum,PageSize,proName,author);
+        request.setAttribute("page",pb);
+        return "home";
+
     }
 }

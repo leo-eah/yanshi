@@ -137,7 +137,7 @@
         </div>
             <ul class="pagination" style="float: right">
                 <li><a href="#">&laquo;</a></li>
-                <li><a href="#">1</a></li>
+                <li><a href="/lookPro/queryPro?p">1</a></li>
                 <li><a href="#">2</a></li>
                 <li><a href="#">3</a></li>
                 <li><a href="#">4</a></li>
@@ -203,17 +203,6 @@ var FileInput = function () {
     return oFile;
 };
 $("#queryPro").click(function () {
-    <%--$.ajax({--%>
-        <%--url:"<%=request.getContextPath()%>/lookPro/queryPro",--%>
-        <%--datatype:"html",--%>
-        <%--data:{proName:$("#proid").val(),author:$("#publisherid").val()},--%>
-        <%--success:function (data) {--%>
-            <%--$("#container").html(data);--%>
-<%--//            $("body").html(data);--%>
-<%--//            $("html").html(data);--%>
-
-        <%--}--%>
-    <%--})--%>
    window.open("<%=request.getContextPath()%>/lookPro/queryPro?proid="+$("#proid").val()+"&&author="+$("#publisherid").val(),'parent')
 
 })
