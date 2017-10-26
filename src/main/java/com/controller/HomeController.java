@@ -38,35 +38,13 @@ public class HomeController {
 
     @RequestMapping("/index")
     public String index(HttpServletRequest request, HttpServletResponse  response) throws FileNotFoundException {
-        ArrayList<Project> list =new ArrayList<Project>();
-        File file= new File("D:/lookPro/pro/");
-        File[] tempList  =file.listFiles();
-        StringBuffer result = new StringBuffer();
-        ArrayList<Project> list1 =new ArrayList<Project>();
-        String[] a = null;
-        try {
-            BufferedReader br =new BufferedReader(new FileReader(new File("D:/lookPro/log.txt")));
-            String s="";
-            s=br.readLine();
-            while (s!=null){
-               a= s.split(",");
-                Project pro = new Project();
-                pro.setId(a[0].trim());
-                pro.setProName(a[1].trim());
-                pro.setAuthor(a[2]);
-                pro.setProVersion(a[3]);
-                pro.setCreateTime(a[4]);
-                pro.setFileName(a[5]);
-                list1.add(pro);
-                s=br.readLine();
-            }
-            br.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        };
-            request.setAttribute("proList",list1);
-
-//        }
+        String proName ="";
+        String author ="";
+        int PageNum = Integer.valueOf(1);
+        int PageSize = 5;
+        HomeService  hs = new HomeService();
+        Page pb =hs.findAllProWithPage(PageNum,PageSize,proName,author);
+        request.setAttribute("page",pb);
         return "home";
     }
     public static void find(String pathname,int depth) throws IOException {
@@ -125,7 +103,6 @@ public class HomeController {
            //序号，名称，提交人，版本号，发布时间，存储位置
            writer=new FileWriter(file1,true);
 //         BufferedWriter bw = new BufferedWriter(writer);
-
            writer.write(uuid.toString()+",");
            writer.write(pro.getProName()+",");
            writer.write(pro.getAuthor()+",");
@@ -199,14 +176,13 @@ public class HomeController {
                 deleteDir(file1);
             }
         }
-        OutputStreamWriter pw;
         ArrayList<String> temp = new ArrayList<String>();
         try {
             BufferedReader br =new BufferedReader(new FileReader(new File("D:/lookPro/log.txt")));
             String s="";
             String[] a=null;
             s=br.readLine();
-            while (s!=null){
+            while (s!=null&&!StringUtils.isEmpty(s)){
                 a= s.split(",");
                 if(!a[1].trim().equals(proName)){
                     temp.add(s);
@@ -225,6 +201,7 @@ public class HomeController {
             for (String t:temp
                  ) {
                writer.write(t);
+                writer.write("\r\n");
             }
             writer.flush();
             writer.close();
@@ -347,15 +324,88 @@ public class HomeController {
 
         return "home";
     }
-    public String findPro(HttpServletResponse response, HttpServletRequest request){
-        String proName =request.getParameter("proName");
-        String author =request.getParameter("author");
+   @RequestMapping("/findPro")
+    public String findPro(HttpServletResponse response, HttpServletRequest request,String proName ,String author){
         int PageNum = Integer.valueOf(request.getParameter("pageNum"));
         int PageSize = 5;
         HomeService  hs = new HomeService();
         Page pb =hs.findAllProWithPage(PageNum,PageSize,proName,author);
         request.setAttribute("page",pb);
+       request.setAttribute("proname",proName);
+       request.setAttribute("publisherName",author);
         return "home";
 
     }
+    @RequestMapping("/update")
+    public  String update(HttpServletRequest request, HttpServletResponse response , Project pro) throws Exception {
+        CommonsMultipartFile file= pro.getPro();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
+        pro.setCreateTime(format.format(new Date()));
+        pro.setProVersion(pro.getProVersion()+1);
+        int index =file.getOriginalFilename().lastIndexOf(".");
+        String str =file.getOriginalFilename().substring(index);
+        String fileName=file.getOriginalFilename().substring(0,index);
+        if(!file.isEmpty()){
+            try {
+                FileOutputStream os = new FileOutputStream("D:/lookPro/rar/"+fileName+".rar");
+                InputStream in = file.getInputStream();
+                int b=0;
+                while((b=in.read())!=-1){ //读取文件
+                    os.write(b);
+                }
+                os.flush(); //关闭流
+                in.close();
+                os.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        File file1 =new File("D:/lookPro/log.txt");
+        if (!file1.exists()){
+            file1.createNewFile();
+        }
+        try {
+        BufferedReader br = new BufferedReader(new FileReader((file1)));
+        StringBuffer sb= new StringBuffer();
+        String str1 = null;
+        String[] a =null;
+        while((str1=br.readLine()) != null){//一行一行读，如果不为空，继续运行
+           a= str1.split(",");
+           if(a[0].equals(pro.getId())){
+               sb.append(a[0]+a[1]+a[2]+Integer.valueOf(a[3]+1)+a[4]+a[5]+"\n");
+           }
+           sb.append(str1+"\n");
+
+        }
+        sb.setLength(sb.length()-1);//因为多加了一个换行符，所以截掉
+        br.close();//关闭输入流
+
+//写入
+        PrintWriter   out = new PrintWriter(new BufferedWriter(new FileWriter("D:/lookPro/log.txt")));
+        out.write(sb.toString());//把sb里面的内容读入E:test.txt中
+
+        out.flush();
+        out.close();
+    }catch(FileNotFoundException e){
+        System.out.println("文件未找到");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+        Unit unit =new Unit();
+        String path = "D:/lookPro/pro";
+        String filepath = "D:/lookPro/rar/"+fileName;
+        if(!StringUtils.isEmpty(str)&& str.equals(".zip")){
+            unit.unzip(filepath+".zip",path);
+        }
+        if (!StringUtils.isEmpty(str)&& str.equals(".rar"))
+        {
+            unit.unrar(filepath+".rar",path);
+        }
+        return "redirect:/lookPro/index";
+    }
+
 }
