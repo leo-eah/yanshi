@@ -40,7 +40,7 @@
         </div><!--/.nav-collapse -->
     </div>
 </nav>
-<div class="container" style="margin-top: 60px" >
+<div class="container" style="margin-top: 20px" >
     <div class="row clearfix">
         <div class="col-md-2 column"></div>
         <div class="col-md-8 column" style="margin-top: 100px">
@@ -79,12 +79,11 @@
                         <div class="modal-body">
                                 <div class="input-group">
                                     <span class="input-group-addon">项目名称</span>
-                                    <input type="text" class="form-control" name="proName" placeholder="啦啦啦">
+                                    <input type="text" class="form-control" name="proName" placeholder="名称">
                                 </div>
                                 <div class="input-group" style="margin-top: 10px">
                                     <span class="input-group-addon">上传人&nbsp;&nbsp;&nbsp;</span>
-                                    <input type="text" class="form-control" name="author" placeholder="哒哒哒">
-
+                                    <input type="text" class="form-control" name="author" placeholder="上传人">
                                 </div>
                                 <div  style="margin-top: 10px">
                                     <input id="file" type="file"name="pro"></div>
@@ -103,7 +102,7 @@
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal -->
             </div>
-        <div style="height: 280px">
+        <div style="height: 320px">
         <table class="table table-striped" style="margin-top: 20px;">
             <caption>项目列表</caption>
             <thead>
@@ -118,50 +117,140 @@
             </tr>
 
             </thead>
-            <c:forEach varStatus="status" var="pro" items="${proList}">
+            <c:forEach varStatus="status" var="pro" items="${page.list}">
                 <tr>
                     <td>${status.index+1}</td>
                     <td>${pro.proName}</td>
-                    <td>${pro.proVersion}</td>
+                    <td  >
+                        <a onclick="overShow('${pro.id}')">${pro.proVersion}</a>
+                    </td>
                     <td>${pro.author}</td>
                     <td>${pro.createTime}</td>
                     <td style="text-align: center">
                         <a href="#" class="btn btn-link"  onclick="openIndex('${pro.fileName}')">查看</a>
-                        更新
+                        <button data-toggle="modal" data-target="#myModal1" value="${pro.id}" name="update" class="btn btn-link">更新 </button>
                         <a href="/lookPro/deletePro?proName=${pro.proName}&&fileName=${pro.fileName}" class="btn btn-link">删除</a>
                         </td>
 
                 </tr>
             </c:forEach>
         </table>
+            <div id="showDiv" style="position: absolute; background-color: white; border: 1px solid ;border-radius: 5px ; border-color: #999999; width: 45px;min-height: 0px;display: none" ></div>
         </div>
+            <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false" >
+                <div class="modal-dialog">
+
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel1">
+                                新建项目
+                            </h4>
+                        </div>
+                        <form action="<%=request.getContextPath()%>/lookPro/update" name="pro" method="post" enctype="multipart/form-data">
+
+                            <div class="modal-body">
+                                <div class="input-group">
+                                    <span class="input-group-addon">项目名称</span>
+                                    <input type="text" class="form-control" name="proName" id="upload"   placeholder="">
+                                </div>
+                                <div class="input-group" style="margin-top: 10px">
+                                    <span class="input-group-addon">上传人&nbsp;&nbsp;&nbsp;</span>
+                                    <input type="text" class="form-control" name="author" placeholder="">
+                                </div>
+                                <input type="hidden" name="id" id="id" >
+                                <div  style="margin-top: 10px">
+                                    <input id="file1" type="file"name="pro"></div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    提交
+                                </button>
+                            </div>
+                        </form>
+
+
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
             <ul class="pagination" style="float: right">
-                <li><a href="#">&laquo;</a></li>
-                <li><a href="/lookPro/queryPro?p">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li><a href="#">&raquo;</a></li>
+              <li> <a href="#" onclick="findPro(1)">首页</a></li>
+                <c:choose>
+                    <c:when test="${page.totalPage eq 1}">
+                        <li>  <a>1</a> </li>
+                    </c:when>
+                    <c:otherwise>
+                        <%--如果当前页为第一页时，就没有上一页这个超链接显示 --%>
+                        <c:if test="${page.pageNum eq 1}">
+                            <c:forEach begin="${page.start}" end="${page.end}" step="1" var="i">
+                                <c:if test="${page.pageNum==i}">
+                                    <li class="active">  <a>${i}</a> </li>
+                                </c:if>
+                                <c:if test="${page.pageNum!=i}">
+                                    <li>   <a href="#" onclick="findPro(${i})">${i}</a> </li>
+                                </c:if>
+                            </c:forEach>
+                            <li>  <a href="#" onclick="findPro(${page.pageNum+1})">&raquo;</a></li>
+                        </c:if>
+                        <%--如果当前页不是第一页也不是最后一页，则有上一页和下一页这个超链接显示 --%>
+                        <c:if test="${page.pageNum >1 && page.pageNum <page.totalPage}">
+                            <a href="#" onclick="findPro(${page.pageNum-1})">&laquo;</a>
+                            <c:forEach begin="${page.start}" end="${page.end}" step="1" var="i">
+                                <c:if test="${page.pageNum==i}">
+                                    <li class="active">  <a>${i}</a> </li>
+                                </c:if>
+                                <c:if test="${page.pageNum!=i}">
+                                    <a href="#" onclick="findPro(${i})">${i}</a>
+                                </c:if>
+                            </c:forEach>
+                            <a href="#" onclick="findPro(${page.pageNum+1})">&raquo;</a>
+                        </c:if>
+                        <%-- 如果当前页是最后一页，则只有上一页这个超链接显示，下一页没有 --%>
+                        <c:if test="${page.pageNum eq page.totalPage}">
+                            <li>  <a href="#" onclick="findPro(${page.pageNum-1})">&laquo;</a></li>
+                            <c:forEach begin="${page.start}" end="${page.end}" step="1" var="i">
+                                <c:if test="${page.pageNum==i}">
+                                    <li class="active">  <a>${i}</a> </li>
+                                </c:if>
+                                <c:if test="${page.pageNum!=i}">
+                                    <li>  <a href="#" onclick="findPro(${i})">${i}</a></li>
+                                </c:if>
+                            </c:forEach>
+                        </c:if>
+                    </c:otherwise>
+                </c:choose>
+
+              <li>  <a href="#" onclick="findPro(${page.totalPage})">尾页</a></li>
             </ul>
+        <div style="background-color: white;margin-left: 40px;  height: 200px;width:600px;margin-top: -400px;filter: alpha(opacity=60); opacity:0.99; -moz-opacity:0.99;display: none"> </div>
         </div>
         <div class="col-md-2 column" id="aa"></div>
     </div>
-
 </div>
 </div>
 </body>
 <script>
 function openIndex(proName) {
     var url="<%=request.getContextPath()%>/pro/"+proName+"/index.html";
-
     window.open(encodeURI(url));
 }
 $(function () {
     var oFileInput = new FileInput();
+    var uFileInput = new FileInput();
+    uFileInput.Init("file1","/lookpro/upload");
     oFileInput.Init("file","/lookpro/upload");
 });
-
+function findPro(pageNum) {
+    window.open("<%=request.getContextPath()%>/lookPro/findPro?proName="+$("#proid").val()+"&&author="+$("#publisherid").val()+"&&pageNum="+pageNum,parent);
+}
+$(":button[name=update]").click(function () {
+    $("#id").val($(this).val());
+});
 var FileInput = function () {
     var oFile = new Object();
 
@@ -203,8 +292,38 @@ var FileInput = function () {
     return oFile;
 };
 $("#queryPro").click(function () {
-   window.open("<%=request.getContextPath()%>/lookPro/queryPro?proid="+$("#proid").val()+"&&author="+$("#publisherid").val(),'parent')
+   window.open("<%=request.getContextPath()%>/lookPro/findPro?proName="+$("#proid").val()+"&&author="+$("#publisherid").val()+"&&pageNum=1",'parent');
 
 })
+$(document).click(function () {
+    $("#showDiv").hide();
+})
+function overShow(id) {
+    var showDiv = document.getElementById('showDiv');
+    showDiv.style.left = event.clientX/2.6+'px';
+    showDiv.style.top = event.clientY/2.5+'px';
+
+
+    var url = "<%=request.getContextPath()%>/lookPro/showVersion";
+    var temp="";
+    $.ajax({
+        url:url,
+        data:{"id":id},
+        success:function (data) {
+            temp+="<table class='table table-striped' >";
+            for(var i=0; i<data.length;i++){
+              temp += "<tr><td><a onclick=openIndex('"+data[i].fileName +"')>"+data[i].proVersion+"</a></td></tr>";
+            }
+            temp+="</table>"
+            showDiv.innerHTML=temp;
+            showDiv.style.display = 'block';
+        },
+        error:function () {
+            alert("sad!");
+        }
+    });
+
+}
+
 </script>
 </html>

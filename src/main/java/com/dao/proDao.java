@@ -17,7 +17,7 @@ public class proDao {
             String[] a = null;
             s = br.readLine();
             String flag = "";
-            while (s != null) {
+            while (s != null && !StringUtils.isEmpty(s)) {
                 a = s.split(",");
                 if (!StringUtils.isEmpty(proName)) {
                     flag = "1";
@@ -96,7 +96,7 @@ public class proDao {
                 s=br.readLine();
                 String flag="";
                 int currrent=0;
-                while (s!=null){
+                while (s!=null&&!StringUtils.isEmpty(s)){
                     currrent+=1;
                     a= s.split(",");
                     if(!StringUtils.isEmpty(proName)){
@@ -136,7 +136,7 @@ public class proDao {
                         if(currrent>=startIndex){
                             proList.add(pro);
                         }
-                        if(currrent>startIndex+pageSize)
+                        if(currrent>=startIndex+pageSize)
                             break;;
                     }
                     if (flag.equals("11")){

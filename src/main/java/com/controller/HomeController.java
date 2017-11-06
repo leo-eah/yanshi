@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -33,7 +34,7 @@ import java.util.UUID;
 public class HomeController {
     //添加一个日志器
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-
+    private static  final  String rootpath = "D:/lookPro";
     //映射一个action
 
     @RequestMapping("/index")
@@ -77,7 +78,7 @@ public class HomeController {
         UUID uuid =UUID.randomUUID();
        if(!file.isEmpty()){
            try {
-               FileOutputStream os = new FileOutputStream("D:/lookPro/rar/"+fileName+".rar");
+               FileOutputStream os = new FileOutputStream(rootpath+"/rar/"+fileName+".rar");
                InputStream in = file.getInputStream();
                int b=0;
                while((b=in.read())!=-1){ //读取文件
@@ -94,7 +95,7 @@ public class HomeController {
            }
 
        }
-       File file1 =new File("D:/lookPro/log.txt");
+       File file1 =new File(rootpath+"/log.txt");
        if (!file1.exists()){
            file1.createNewFile();
        }
@@ -117,8 +118,8 @@ public class HomeController {
            e.printStackTrace();
        }
        Unit unit =new Unit();
-       String path = "D:/lookPro/pro";
-       String filepath = "D:/lookPro/rar/"+fileName;
+       String path = rootpath+"/pro";
+       String filepath = rootpath+"/rar/"+fileName;
        if(!StringUtils.isEmpty(str)&& str.equals(".zip")){
            unit.unzip(filepath+".zip",path);
        }
@@ -133,7 +134,7 @@ public class HomeController {
     @RequestMapping("/openIndex")
     public void openIndex(HttpServletRequest request, HttpServletResponse response, String proName) throws IOException {
 
-        File file = new File("D:/lookPro/pro/" + proName + "/index.html");
+        File file = new File(rootpath+"/pro/" + proName + "/index.html");
 
         response.setContentType("multipart/form-data");
         response.setCharacterEncoding("utf-8");
@@ -165,8 +166,8 @@ public class HomeController {
     @RequestMapping("/deletePro")
     public  String deletePrp(HttpServletResponse response ,HttpServletRequest request,String proName,String fileName){
         if (proName!=null&&!proName.equals("")){
-            String project = "D:/lookPro/pro/"+fileName;
-            String project1 = "D:/lookPro/rar/"+fileName;
+            String project = rootpath+"/pro/"+fileName;
+            String project1 = rootpath+"/rar/"+fileName;
             File file =new File(project);
             File file1 =new File(project1);
             if (file.exists()&&file.isDirectory()){
@@ -178,7 +179,7 @@ public class HomeController {
         }
         ArrayList<String> temp = new ArrayList<String>();
         try {
-            BufferedReader br =new BufferedReader(new FileReader(new File("D:/lookPro/log.txt")));
+            BufferedReader br =new BufferedReader(new FileReader(new File(rootpath+"/log.txt")));
             String s="";
             String[] a=null;
             s=br.readLine();
@@ -196,7 +197,7 @@ public class HomeController {
         FileWriter writer;
 
         try {
-            writer=new FileWriter(new File("D:/lookPro/log.txt"));
+            writer=new FileWriter(new File(rootpath+"/log.txt"));
 
             for (String t:temp
                  ) {
@@ -248,7 +249,7 @@ public class HomeController {
     public String queryPro(HttpServletRequest request,HttpServletResponse response,String proName,String author){
        ArrayList<Project> proList =new ArrayList<Project>();
        try{
-        BufferedReader br =new BufferedReader(new FileReader(new File("D:/lookPro/log.txt")));
+        BufferedReader br =new BufferedReader(new FileReader(new File(rootpath+"/log.txt")));
         String s="";
         String[] a =null;
         s=br.readLine();
@@ -347,7 +348,7 @@ public class HomeController {
         String fileName=file.getOriginalFilename().substring(0,index);
         if(!file.isEmpty()){
             try {
-                FileOutputStream os = new FileOutputStream("D:/lookPro/rar/"+fileName+".rar");
+                FileOutputStream os = new FileOutputStream(rootpath+"/rar/"+fileName+".rar");
                 InputStream in = file.getInputStream();
                 int b=0;
                 while((b=in.read())!=-1){ //读取文件
@@ -364,28 +365,41 @@ public class HomeController {
             }
 
         }
-        File file1 =new File("D:/lookPro/log.txt");
+        File file1 =new File(rootpath+"/log.txt");
+        if (!file1.exists()){
+            file1.createNewFile();
+        }
+        File file2 =new File(rootpath+"/version.txt");
         if (!file1.exists()){
             file1.createNewFile();
         }
         try {
+        FileWriter fileWriter=new FileWriter(file2,true);
         BufferedReader br = new BufferedReader(new FileReader((file1)));
         StringBuffer sb= new StringBuffer();
         String str1 = null;
         String[] a =null;
+        String doma =",";
+
         while((str1=br.readLine()) != null){//一行一行读，如果不为空，继续运行
            a= str1.split(",");
            if(a[0].equals(pro.getId())){
-               sb.append(a[0]+a[1]+a[2]+Integer.valueOf(a[3]+1)+a[4]+a[5]+"\n");
+               sb.append(a[0]+doma+a[1]+doma+a[2]+doma+(Integer.valueOf(a[3])+1)+doma+a[4]+doma+fileName+"\r\n");
+               File  oldFile = new File(rootpath+"/pro/"+a[5].trim());
+               oldFile.renameTo(new File(rootpath+"/pro/"+a[5].trim()+a[3].trim()));
+               File  oldFile2 = new File(rootpath+"/rar/"+a[5].trim());
+               oldFile2.renameTo(new File(rootpath+"/rar/"+a[5].trim()+a[3].trim()));
+               fileWriter.write(a[0]+doma+a[1]+doma+a[2]+doma+a[3]+doma+a[4]+doma+(a[5].trim()+a[3].trim())+"\r\n");
+           }else{
+               sb.append(str1+"\n");
            }
-           sb.append(str1+"\n");
-
         }
         sb.setLength(sb.length()-1);//因为多加了一个换行符，所以截掉
         br.close();//关闭输入流
-
+        fileWriter.flush();
+        fileWriter.close();
 //写入
-        PrintWriter   out = new PrintWriter(new BufferedWriter(new FileWriter("D:/lookPro/log.txt")));
+        PrintWriter   out = new PrintWriter(new BufferedWriter(new FileWriter(rootpath+"/log.txt")));
         out.write(sb.toString());//把sb里面的内容读入E:test.txt中
 
         out.flush();
@@ -396,8 +410,8 @@ public class HomeController {
         e.printStackTrace();
     }
         Unit unit =new Unit();
-        String path = "D:/lookPro/pro";
-        String filepath = "D:/lookPro/rar/"+fileName;
+        String path = rootpath+"/pro";
+        String filepath = rootpath+"/rar/"+fileName;
         if(!StringUtils.isEmpty(str)&& str.equals(".zip")){
             unit.unzip(filepath+".zip",path);
         }
@@ -406,6 +420,43 @@ public class HomeController {
             unit.unrar(filepath+".rar",path);
         }
         return "redirect:/lookPro/index";
+    }
+    @ResponseBody
+    @RequestMapping("/showVersion")
+    public List<Project> showVersion (HttpServletRequest request ,String id,HttpServletResponse response) throws IOException {
+
+       List<Project> list = new ArrayList<Project>();
+        File file  = new File(rootpath+"/version.txt");
+        if(!file.exists()){
+            file.createNewFile();
+        }
+        FileReader fileReader = new FileReader(file);
+        BufferedReader br = new BufferedReader(fileReader);
+        StringBuffer buffer = new StringBuffer();
+        String s ="";
+        String[] info = null;
+        try {
+          s= br.readLine();
+          while (s!=null){
+             info= s.split(",");
+             if(info[0].trim().equals(id)){
+                 Project pro =new Project();
+                 pro.setId(info[0].trim());
+                 pro.setProVersion(info[3].trim());
+                 pro.setFileName(info[5].trim());
+                 list.add(pro);
+             }
+             s=br.readLine();
+          }
+
+        }catch ( FileNotFoundException e){
+
+        }
+        finally {
+            br.close();
+            fileReader.close();
+        }
+        return list;
     }
 
 }
