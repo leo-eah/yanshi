@@ -15,6 +15,7 @@
     <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="<%=request.getContextPath()%>/js/fileinput.js"></script>
+    <script src="<%=request.getContextPath()%>/js/bootstrap-treeview.js"></script>
     <script src="<%=request.getContextPath()%>/js/zh.js"></script>
 </head>
 
@@ -127,7 +128,8 @@
                     <td>${pro.author}</td>
                     <td>${pro.createTime}</td>
                     <td style="text-align: center">
-                        <a href="#" class="btn btn-link"  onclick="openIndex('${pro.fileName}')">查看</a>
+                        <%--<a href="#" class="btn btn-link"  onclick="openIndex('${pro.fileName}')">查看</a>--%>
+                        <a href="#" class="btn btn-link"  onclick="openProDic('${pro.fileName}')">查看</a>
                         <button data-toggle="modal" data-target="#myModal1" value="${pro.id}" name="update" class="btn btn-link">更新 </button>
                         <a href="/lookPro/deletePro?proName=${pro.proName}&&fileName=${pro.fileName}" class="btn btn-link">删除</a>
                         </td>
@@ -136,6 +138,7 @@
             </c:forEach>
         </table>
             <div id="showDiv" style="position: absolute; background-color: white; border: 1px solid ;border-radius: 5px ; border-color: #999999; width: 45px;min-height: 0px;display: none" ></div>
+            <div id="proDic" style="width:600px;height: 400px;background-color: white;position: absolute;top: 70px;left: 80px;display: none" ></div>
         </div>
             <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false" >
                 <div class="modal-dialog">
@@ -239,6 +242,42 @@ function openIndex(proName) {
     var url="<%=request.getContextPath()%>/pro/"+proName+"/index.html";
     window.open(encodeURI(url));
 }
+function openProDic(fileName) {
+    $.ajax({
+        url:"<%=request.getContextPath()%>/lookPro/openProDic",
+        data:{path:fileName},
+        success:function (data) {
+          var tree ="["+ data+"]";
+            $("#proDic").treeview({data:tree});
+            $("#proDic").show();
+        },
+        error:function () {
+            alert("sad!");
+        }
+    })
+//    var tree=[{
+//        text: "Node 1",
+//        icon: "glyphicon glyphicon-stop",
+//        selectedIcon: "glyphicon glyphicon-stop",
+//        color: "#000000",
+//        backColor: "#FFFFFF",
+//        href: "#node-1",
+//        selectable: true,
+//        state: {
+//            checked: true,
+//            disabled: false,
+//            expanded: true,
+//            selected: true
+//        },
+//        tags: ['available'],
+//        nodes: [
+//            {},
+//
+//    ]
+//}];
+//    $("#proDic").treeview({data:tree});
+//    $("#proDic").show();
+}
 $(function () {
     var oFileInput = new FileInput();
     var uFileInput = new FileInput();
@@ -301,7 +340,7 @@ $(document).click(function () {
 function overShow(id) {
     var showDiv = document.getElementById('showDiv');
     showDiv.style.left = event.clientX/2.6+'px';
-    showDiv.style.top = event.clientY/2.5+'px';
+    showDiv.style.top = event.clientY/2.0+'px';
 
 
     var url = "<%=request.getContextPath()%>/lookPro/showVersion";

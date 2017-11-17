@@ -1,8 +1,8 @@
 package com.controller;
 
 import com.bo.Page;
+import com.service.FileService;
 import com.service.HomeService;
-import com.util.TextSearchUnit;
 import com.util.Unit;
 import com.vo.Project;
 import org.slf4j.Logger;
@@ -458,5 +458,11 @@ public class HomeController {
         }
         return list;
     }
-
+    @ResponseBody
+    @RequestMapping(value = "/openProDic")
+ public String openProDic(HttpServletRequest request,HttpServletResponse response){
+     FileService fileService = new FileService();
+     String temp = String.valueOf(fileService.getBuf(request.getParameter("path")));
+        return  temp;
+ }
 }

@@ -6,13 +6,30 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class proDao {
     public static List<Project> findAllPro(String proName,String author) {
         ArrayList<Project> proList = new ArrayList<Project>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(new File("D:/lookPro/log.txt")));
+            File file =new File("D:/lookPro");
+            File file1 =new File("D:/lookPro/rar");
+            File file2 =new File("D:/lookPro/pro");
+            File file3 = new File("D:/lookPro/log.txt");
+            if (!file.exists()){
+                file.mkdirs();
+            }
+            if (!file1.exists()){
+                file1.mkdirs();
+            }
+            if (!file2.exists()){
+                file2.mkdirs();
+            }
+            if (!file3.exists()){
+                file3.createNewFile();
+            }
+            BufferedReader br = new BufferedReader(new FileReader(file3));
             String s = "";
             String[] a = null;
             s = br.readLine();
