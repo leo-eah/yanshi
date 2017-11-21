@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,7 +79,11 @@ public class HomeController {
         UUID uuid =UUID.randomUUID();
        if(!file.isEmpty()){
            try {
-               FileOutputStream os = new FileOutputStream(rootpath+"/rar/"+fileName+".rar");
+               FileOutputStream os;
+               if(str.equals("zip")){
+                  os = new FileOutputStream(rootpath+"/rar/"+fileName+".rar");
+               }else
+               os = new FileOutputStream(rootpath+"/rar/"+fileName+".zip");
                InputStream in = file.getInputStream();
                int b=0;
                while((b=in.read())!=-1){ //读取文件
@@ -460,9 +465,11 @@ public class HomeController {
     }
     @ResponseBody
     @RequestMapping(value = "/openProDic")
- public String openProDic(HttpServletRequest request,HttpServletResponse response){
+ public String openProDic(HttpServletRequest request,HttpServletResponse response) throws IOException {
      FileService fileService = new FileService();
-     String temp = String.valueOf(fileService.getBuf(request.getParameter("path")));
+
+     String path = URLDecoder.decode(request.getParameter("path"),"UTF-8") ;
+     String temp = String.valueOf(fileService.getBuf(path));
         return  temp;
  }
 }

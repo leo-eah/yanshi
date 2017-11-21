@@ -17,6 +17,14 @@
     <script src="<%=request.getContextPath()%>/js/fileinput.js"></script>
     <script src="<%=request.getContextPath()%>/js/bootstrap-treeview.js"></script>
     <script src="<%=request.getContextPath()%>/js/zh.js"></script>
+    <style>
+        .glyphicon{
+            font-size:12px;
+            color: #1864a4;
+        }
+        .glyphicon2{
+            font-size:6px ;
+        }</style>
 </head>
 
 <body style="background-image:url(<%=request.getContextPath()%>/image/home.jpg)">
@@ -243,12 +251,13 @@ function openIndex(proName) {
     window.open(encodeURI(url));
 }
 function openProDic(fileName) {
+   fileName = encodeURI(fileName);
     $.ajax({
         url:"<%=request.getContextPath()%>/lookPro/openProDic",
         data:{path:fileName},
         success:function (data) {
           var tree ="["+ data+"]";
-            $("#proDic").treeview({data:tree});
+            $("#proDic").treeview({data:tree,enableLinks: true});
             $("#proDic").show();
         },
         error:function () {
@@ -256,12 +265,12 @@ function openProDic(fileName) {
         }
     })
 //    var tree=[{
-//        text: "Node 1",
+//        text: "123123Node 1 ",
 //        icon: "glyphicon glyphicon-stop",
 //        selectedIcon: "glyphicon glyphicon-stop",
 //        color: "#000000",
 //        backColor: "#FFFFFF",
-//        href: "#node-1",
+//        href: "http://www.baidu.com",
 //        selectable: true,
 //        state: {
 //            checked: true,
@@ -275,9 +284,10 @@ function openProDic(fileName) {
 //
 //    ]
 //}];
-//    $("#proDic").treeview({data:tree});
+//    $("#proDic").treeview({data:tree,enableLinks: true});
 //    $("#proDic").show();
 }
+
 $(function () {
     var oFileInput = new FileInput();
     var uFileInput = new FileInput();
