@@ -146,7 +146,20 @@
             </c:forEach>
         </table>
             <div id="showDiv" style="position: absolute; background-color: white; border: 1px solid ;border-radius: 5px ; border-color: #999999; width: 45px;min-height: 0px;display: none" ></div>
-            <div id="proDic" style="width:600px;height: 400px;background-color: white;position: absolute;top: 70px;left: 80px;display: none" ></div>
+            <div class="modal-dialog" style="display: none" id="proContent">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="proClose" onclick="$('#proContent').hide()">
+                            ×
+                        </button>
+                        <h4 class="modal-title " style="text-align: center" >
+                           项目目录
+                        </h4>
+                    </div>
+                    <%--<div id="proDic" class="row pre-scrollable"  style="width:600px;max-height: 300px;background-color: white;position: absolute;top:130px; left: 90px;display: none" ></div>--%>
+                    <div id="proDic" class=" pre-scrollable" ></div>
+                </div>
+            </div>
         </div>
             <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false" >
                 <div class="modal-dialog">
@@ -258,7 +271,7 @@ function openProDic(fileName) {
         success:function (data) {
           var tree ="["+ data+"]";
             $("#proDic").treeview({data:tree,enableLinks: true});
-            $("#proDic").show();
+            $("#proContent").show();
         },
         error:function () {
             alert("sad!");

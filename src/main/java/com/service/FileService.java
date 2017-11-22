@@ -65,7 +65,7 @@ public class FileService {
                  buf.append(space(kai)).append("{\n").append(space(++kai)).append("\"text\" : \"").append(f.getName()).append("\",\n").append("\"icon\":\"glyphicon glyphicon-flag\"");
                  String a = f.getAbsolutePath().substring(14).replaceAll("\\\\","/");
 
-                 buf.append(",\"href\":\"<%=request.getContextPath()%>/pro"+a+"\"").append(space(--kai)).append("},\n");
+                 buf.append(",\"href\":\"../pro"+a+"\"").append(space(--kai)).append("},\n");
                  String b = f.getCanonicalPath();
                  String c = f.getPath();
              }
