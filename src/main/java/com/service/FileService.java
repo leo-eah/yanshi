@@ -12,6 +12,7 @@ import java.util.List;
 
 public class FileService {
    FileType fileType =new FileType();
+   String temp = "";
     public static void main(String[] args) throws IOException {
         FileService d = new FileService();
         d.scan("D:\\ideaWorkspace\\report2");
@@ -53,7 +54,9 @@ public class FileService {
                  buf.append("\n").append(space(--kai)).append("]\n").append(space(--kai)).append("},\n");
              }
              else if(fileType.fileType(f.getName()).equals("文档")){
-                 buf.append(space(kai)).append("{\n").append(space(++kai)).append("\"text\" : \"").append(f.getName()).append("\",\n").append("\"icon\":\"glyphicon glyphicon-file\"").append(space(--kai)).append("},\n");
+                 buf.append(space(kai)).append("{\n").append(space(++kai)).append("\"text\" : \"").append(f.getName()).append("\",\n").append("\"icon\":\"glyphicon glyphicon-file\"");
+                 temp = f.getAbsolutePath().substring(14).replaceAll("\\\\","/");
+                 buf.append(",\"href\":\"../pro"+temp+"\"").append(space(--kai)).append("},\n");
              }
              else if(fileType.fileType(f.getName()).equals("音乐")){
                  buf.append(space(kai)).append("{\n").append(space(++kai)).append("\"text\" : \"").append(f.getName()).append("\",\n").append("\"icon\":\"glyphicon glyphicon-headphones\"").append(space(--kai)).append("},\n");
@@ -63,11 +66,8 @@ public class FileService {
              }
              else if(fileType.fileType(f.getName()).equals("网页")){
                  buf.append(space(kai)).append("{\n").append(space(++kai)).append("\"text\" : \"").append(f.getName()).append("\",\n").append("\"icon\":\"glyphicon glyphicon-flag\"");
-                 String a = f.getAbsolutePath().substring(14).replaceAll("\\\\","/");
-
-                 buf.append(",\"href\":\"../pro"+a+"\"").append(space(--kai)).append("},\n");
-                 String b = f.getCanonicalPath();
-                 String c = f.getPath();
+                 temp = f.getAbsolutePath().substring(14).replaceAll("\\\\","/");
+                 buf.append(",\"href\":\"../pro"+temp+"\"").append(space(--kai)).append("},\n");
              }
              else buf.append(space(kai)).append("{\n").append(space(++kai)).append("\"text\" : \"").append(f.getName()).append("\"\n").append(space(--kai)).append("},\n");
 
